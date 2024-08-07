@@ -1,4 +1,4 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model, default: mongoose } = require("mongoose");
 
 const userSchema = new Schema(
   {
@@ -19,6 +19,17 @@ const userSchema = new Schema(
       required: [true, "Password is required."],
     },
     address: { type: String },
+    role: {
+      type: String,
+      default: "user",
+      enum: ["admin", "user"],
+    },
+    cart: [
+      {
+        type: Schema.type.objectId,
+        ref: "Product",
+      },
+    ],
   },
   {
     // this second object adds extra properties: `createdAt` and `updatedAt`

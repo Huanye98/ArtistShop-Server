@@ -9,20 +9,15 @@ const paymentSchema = new mongoose.Schema({
       enum: ["incomplete", "succeeded"],
       default: "incomplete",
     },
-    products: [
+    product: 
       {
-        productId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Product",
-          required: [true, "Product ID is required."],
-        },
-        quantity: { type: Number, required: [true, "Quantity is required."], min: 0 },
+          type: [mongoose.Schema.Types.ObjectId],
+          ref: "Product"
       },
-    ],
-    // user: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "User"
-    // },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User"
+    },
   });
 
   const Payment = mongoose.model("Payment",paymentSchema)

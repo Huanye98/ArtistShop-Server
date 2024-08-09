@@ -1,6 +1,6 @@
 const express = require("express")
 const router = express.Router()
-
+const {tokenValidation} = require("../middlewares/auth.middlewares")
 const Product = require("../models/Product.model")
 //get all products
 router.get("/",async (req,res,next)=>{
@@ -19,7 +19,7 @@ router.post("/",async (req,res,next)=>{
     console.log(req.body)
     try {
         const {name,price,img,description,category,isAvailable,discountValue} = req.body
-        const newProduct = await Product.Create({
+        const newProduct = await Product.create({
             name,
             price,
             description,
@@ -63,9 +63,9 @@ router.patch("/:productId",async (req,res,next)=>{
             category
         },{new:true})
         if (!updatedProduct){
-            return res.status(200).json({message: "Product not found"})
+            return res.status(404).json({message: "Product not found"})
         }
-        res.sendStatus(200).json(response)
+        res.sendStatus(200).json(updatedProduct)
     } catch (error) {
         next(error)
     }
@@ -86,3 +86,5 @@ router.delete("/:productId",async (req,res,next)=>{
     }
 
 })
+
+module.exports = router

@@ -88,7 +88,7 @@ router.post("/login",async (req,res,next)=>{
 
 //Verify
 router.get("/verify",tokenValidation,(req,res,next)=>{
-    console.log(req,payload)
+    console.log(req.payload)
     res.status(200).json(req.payload)
 })
 

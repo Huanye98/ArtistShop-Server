@@ -18,14 +18,14 @@ router.post("/",async (req,res,next)=>{
 
     console.log(req.body)
     try {
-        const {name,price,img,description,category,isAvailable,discountValue} = req.body
+        const {name,price,imageUrl,description,category,isAvailable,discountValue} = req.body
         const newProduct = await Product.create({
             name,
             price,
             description,
             isAvailable,
             discountValue,
-            img,
+            imageUrl,
             category
         })
         res.sendStatus(201).json(newProduct)
@@ -52,14 +52,14 @@ router.get("/:productId",async (req,res,next)=>{
 router.patch("/:productId",async (req,res,next)=>{
 
     try {
-        const {name,price,img,description,category, isAvailable, discountValue} = req.body
+        const {name,price,imageUrl,description,category, isAvailable, discountValue} = req.body
         const updatedProduct = await Product.findByIdAndUpdate(req.params.productId,{
             name,
             price,
             description,
             isAvailable,
             discountValue,
-            img,
+            imageUrl,
             category
         },{new:true})
         if (!updatedProduct){

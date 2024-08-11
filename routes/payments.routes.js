@@ -1,78 +1,74 @@
-const express = require("express")
-const router = express.Router()
-const {tokenValidation} = require("../middlewares/auth.middlewares")
-const Payment = require("../models/payment.model")
-//get all Payments
-router.get("/",async (req,res,next)=>{
+const express = require("express");
+const router = express.Router();
+const { tokenValidation } = require("../middlewares/auth.middlewares");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const Payment = require("../models/payment.model");
 
-    try {
-        const response = await Payment.find({})
-        res.status(200).json(response)
-    } catch (error) {
-        next(error)
-    }
-
-})
 //post Payment
-router.post("/",async (req,res,next)=>{
+router.post("/create-payment-intent", async (req, res, next) => {
+  const { amount, products, user } = req.body;
+  console.log(req.body);
 
-    console.log(req.body)
-    try {
-        const {price,paymentIntentId,clientSecret,status,Payment,user} = req.body
-        const newPayment = await Payment.create({
-            price,paymentIntentId,clientSecret,status,Payment,user
-        }).populate("User")
-        res.sendStatus(201).json(newPayment)
-    } catch (error) {
-        next(error)
+  try {
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: amount,
+      currency: "eur",
+      automatic_payment_methods: {
+        enabled: true,
+      },
+    });
+    await Payment.create({
+      price: amount,
+      product: products,
+      status: "incomplete",
+      user: user,
+      paymentIntentId: paymentIntent.id,
+      clientSecret: paymentIntent.client_secret,
+      // buyer: req.payload // example to add who bought the product (not done in this example)
+    });
+    const populatedPayment = await Payment.findById(payment._id)
+      .populate("product")
+      .exec();
+
+    res.send({
+      clientSecret: paymentIntent.client_secret,
+      payment: populatedPayment
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+//modify data and send to our database
+router.patch("/update-payment-intent", async (req, res, next) => {
+  const { clientSecret, paymentIntentId } = req.body;
+  try {
+    await Payment.findOneAndUpdate(
+      {
+        clientSecret: clientSecret,
+        paymentIntentId: paymentIntentId,
+      },
+      {
+        status: "succeeded",
+      }
+    );
+    res.status(200).json();
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.get("/",async (req,res,next)=>{
+  try {
+    const payments = await Payment.find({})
+    .populate("product")
+    if(!payments){
+      return res.status(404).json({message: "Payment not found"})
     }
-
-})
-//get specific Payment
-router.get("/:paymentId",async (req,res,next)=>{
-    try {
-        const selectedPayment = await Payment.findById(req.params.paymentId)
-        if(!selectedPayment){
-            return res.status(404)({message:"Payment not found"})
-        }
-        res.status(200).json(selectedPayment)
-    } catch (error) {
-        next(error)
-    }
-
+    res.json(payments)
+  } catch (error) {
+    next(error)
+  }
 })
 
-//modify Payment
-router.patch("/:paymentId",async (req,res,next)=>{
 
-    try {
-        const {price,paymentIntentId,clientSecret,status,Payment,user} = req.body
-        const updatedPayment = await Payment.findByIdAndUpdate(req.params.PaymentId,{
-            price,paymentIntentId,clientSecret,status,Payment,user
-        },{new:true})
-        if (!updatedPayment){
-            return res.status(404).json({message: "Payment not found"})
-        }
-        res.sendStatus(200).json(updatedPayment)
-    } catch (error) {
-        next(error)
-    }
-
-})
-//delete Payment
-
-router.delete("/:paymentId",async (req,res,next)=>{
-
-    try {
-        const deletedPayment = await Payment.findByIdAndDelete(req.params.paymentId)
-        if(!deletedPayment){
-            return res.status(404).json({message: "Payment not found"})
-        }
-        res.sendStatus(202).json({message: "Payment deleted"})
-    } catch (error) {
-        next(error)
-    }
-
-})
-
-module.exports = router
+module.exports = router;

@@ -17,7 +17,7 @@ router.post("/create-payment-intent", async (req, res, next) => {
         enabled: true,
       },
     });
-    await Payment.create({
+    const payment = await Payment.create({
       price: amount,
       product: products,
       status: "incomplete",

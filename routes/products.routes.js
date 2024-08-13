@@ -2,12 +2,30 @@ const express = require("express")
 const router = express.Router()
 const {tokenValidation} = require("../middlewares/auth.middlewares")
 const Product = require("../models/Product.model")
-//get all products
+//get 20 products
 router.get("/",async (req,res,next)=>{
 
     try {
-        const response = await Product.find({})
-        res.status(200).json(response)
+        //paginación
+        // página que se carga, cantidad de rpoductos por página, cantidad de productos que saltarse.
+        // saltarse los productos skip y get la cantidad
+        // contar cuántos productos hay para poder poner el máximo de páginas
+        // enviar todo en un paquete + la cantidad máxima de páginas
+        const page = parseInt(req.query.page) || 1
+        const limit = parseInt(req.query.limit) || 10
+        const skip = (page-1)*limit
+        //query
+        const category = req.query.category? {category : req.query.category} : {}
+
+        const products = await Product.find(category).skip(skip).limit(limit)
+        const allProductsNum = await Product.countDocuments(category)
+        res.status(200).json({
+            page,
+            limit,
+            allProductsNum,
+            totalPages: Math.ceil(allProductsNum/limit),
+            products
+        })
     } catch (error) {
         next(error)
     }
@@ -15,8 +33,6 @@ router.get("/",async (req,res,next)=>{
 })
 //post product
 router.post("/",async (req,res,next)=>{
-
-    console.log(req.body)
     try {
         const {name,price,imageUrl,description,category,isAvailable,discountValue} = req.body
         const newProduct = await Product.create({

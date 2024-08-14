@@ -2,6 +2,17 @@ const express = require("express")
 const router = express.Router()
 const {tokenValidation} = require("../middlewares/auth.middlewares")
 const Product = require("../models/Product.model")
+
+router.get("/all",async(req,res,next)=>{
+    try {
+        const products = await Product.find({},"name")
+        res.status(200).json(products)
+    } catch (error) {
+        next(error)
+    }
+})
+
+
 //get 20 products
 router.get("/",async (req,res,next)=>{
 
@@ -12,7 +23,7 @@ router.get("/",async (req,res,next)=>{
         // contar cuántos productos hay para poder poner el máximo de páginas
         // enviar todo en un paquete + la cantidad máxima de páginas
         const page = parseInt(req.query.page) || 1
-        const limit = parseInt(req.query.limit) || 10
+        const limit = parseInt(req.query.limit) || 18
         const skip = (page-1)*limit
         //query
         const category = req.query.category? {category : req.query.category} : {}

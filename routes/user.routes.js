@@ -19,6 +19,27 @@ router.get("/own", tokenValidation, async (req, res, next) => {
     next(error);
   }
 });
+//change address
+router.patch("/own/address", tokenValidation, async (req, res, next) => {
+  console.log(req.payload);
+  const { address } = req.body;
+  if (!address) {
+    return res.status(400).json({ message: "Address is required" });
+  }
+  try {
+    const user = await User.findByIdAndUpdate(
+      req.payload._id,
+      {address: address},
+      { new: true }
+    );
+    if (!user) {
+      return res.status(404).json({ message: "Was not able to change address" });
+    }
+    res.json(user);
+  } catch (error) {
+    next(error);
+  }
+});
 //add to cart
 router.patch("/own", tokenValidation, async (req, res, next) => {
   console.log(req.payload);
@@ -76,6 +97,15 @@ router.get("/admin", tokenValidation, adminValidation, (req, res, next) => {
   console.log("This route is only accessible for logged users and Admin");
 });
 
+router.get("/admin/users", tokenValidation, adminValidation,async (req, res, next) => {
+  try {
+    const users = await User.find({},"username email address createdAt cart").populate("cart")
+    res.status(200).json(users)
+  } catch (error) {
+    next(error)
+  }
+});
+
 router.post(
   "/admin/product",
   tokenValidation,
@@ -114,6 +144,7 @@ router.delete(
     }
   }
 );
+
 
 router.patch(
   "/admin/product/:product",

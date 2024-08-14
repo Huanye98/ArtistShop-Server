@@ -11,6 +11,14 @@ router.get("/all",async(req,res,next)=>{
         next(error)
     }
 })
+router.get("/all/images",async(req,res,next)=>{
+    try {
+        const products = await Product.find({category:["Print"]},"name imageUrl")
+        res.status(200).json(products)
+    } catch (error) {
+        next(error)
+    }
+})
 
 
 //get 20 products

@@ -29,11 +29,13 @@ router.patch("/own/address", tokenValidation, async (req, res, next) => {
   try {
     const user = await User.findByIdAndUpdate(
       req.payload._id,
-      {address: address},
+      { address: address },
       { new: true }
     );
     if (!user) {
-      return res.status(404).json({ message: "Was not able to change address" });
+      return res
+        .status(404)
+        .json({ message: "Was not able to change address" });
     }
     res.json(user);
   } catch (error) {
@@ -97,14 +99,22 @@ router.get("/admin", tokenValidation, adminValidation, (req, res, next) => {
   console.log("This route is only accessible for logged users and Admin");
 });
 
-router.get("/admin/users", tokenValidation, adminValidation,async (req, res, next) => {
-  try {
-    const users = await User.find({},"username email address createdAt cart").populate("cart")
-    res.status(200).json(users)
-  } catch (error) {
-    next(error)
+router.get(
+  "/admin/users",
+  tokenValidation,
+  adminValidation,
+  async (req, res, next) => {
+    try {
+      const users = await User.find(
+        {},
+        "username email address createdAt cart"
+      ).populate("cart");
+      res.status(200).json(users);
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 router.post(
   "/admin/product",
@@ -145,7 +155,6 @@ router.delete(
   }
 );
 
-
 router.patch(
   "/admin/product/:product",
   tokenValidation,
@@ -154,22 +163,20 @@ router.patch(
     if (!req.body) {
       return res.status(400).json({ message: "No fields provided for update" });
     }
-    console.log("body",req.body)
-    console.log("params",req.params.product)
+    console.log("body", req.body);
+    console.log("params", req.params.product);
     try {
       const { product } = req.params;
-      const editedProduct = await Product.findByIdAndUpdate(
-        product,
-        req.body,
-        { new: true }
-      );
-      console.log("product was modified")
+      const editedProduct = await Product.findByIdAndUpdate(product, req.body, {
+        new: true,
+      });
+      console.log("product was modified");
       if (!editedProduct) {
         return res
           .status(404)
           .json({ message: "Was not able to edit Product" });
       }
-      res.sendStatus(200).json(editedProduct,{ message: "Product updated" });
+      res.sendStatus(200).json(editedProduct, { message: "Product updated" });
     } catch (error) {
       next(error);
     }

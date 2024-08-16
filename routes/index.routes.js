@@ -4,19 +4,19 @@ router.get("/", (req, res, next) => {
   res.json("All good in here");
 });
 
-const authRouter = require("./auth.routes")
-router.use("/auth",authRouter)
+const authRouter = require("./auth.routes");
+router.use("/auth", authRouter);
 
-const userRouter = require("./user.routes")
-router.use("/user",userRouter)
+const userRouter = require("./user.routes");
+router.use("/user", userRouter);
 
-const productsRouter = require("./products.routes")
-router.use("/products",productsRouter)
+const productsRouter = require("./products.routes");
+router.use("/products", productsRouter);
 
-const uploadRoutes = require("./upload.routes")
-router.use("/upload",uploadRoutes)
+const uploadRoutes = require("./upload.routes");
+router.use("/upload", uploadRoutes);
 
-const paymentRoutes = require("./payments.routes")
-router.use("/payments",paymentRoutes)
+const paymentRoutes = require("./payments.routes");
+router.use("/payments", paymentRoutes);
 
 module.exports = router;

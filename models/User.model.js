@@ -26,13 +26,12 @@ const userSchema = new Schema(
     },
     cart: [
       {
-        type:  mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: "Product",
       },
     ],
   },
   {
-    // this second object adds extra properties: `createdAt` and `updatedAt`
     timestamps: true,
   }
 );

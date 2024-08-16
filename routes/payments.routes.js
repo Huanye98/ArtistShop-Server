@@ -24,7 +24,6 @@ router.post("/create-payment-intent", async (req, res, next) => {
       user: user,
       paymentIntentId: paymentIntent.id,
       clientSecret: paymentIntent.client_secret,
-      // buyer: req.payload // example to add who bought the product (not done in this example)
     });
     const populatedPayment = await Payment.findById(payment._id)
       .populate("product")
@@ -32,7 +31,7 @@ router.post("/create-payment-intent", async (req, res, next) => {
 
     res.send({
       clientSecret: paymentIntent.client_secret,
-      payment: populatedPayment
+      payment: populatedPayment,
     });
   } catch (error) {
     next(error);
@@ -57,18 +56,16 @@ router.patch("/update-payment-intent", async (req, res, next) => {
   }
 });
 
-router.get("/",async (req,res,next)=>{
+router.get("/", async (req, res, next) => {
   try {
-    const payments = await Payment.find({})
-    .populate("product")
-    if(!payments){
-      return res.status(404).json({message: "Payment not found"})
+    const payments = await Payment.find({}).populate("product");
+    if (!payments) {
+      return res.status(404).json({ message: "Payment not found" });
     }
-    res.json(payments)
+    res.json(payments);
   } catch (error) {
-    next(error)
+    next(error);
   }
-})
-
+});
 
 module.exports = router;

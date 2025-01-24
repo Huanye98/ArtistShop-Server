@@ -2,7 +2,7 @@ const express = require("express");
 const logger = require("morgan");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
-const FRONTEND_URL = process.env.ORIGIN || "http://localhost:5173";
+const FRONTEND_URL = process.env.ORIGIN || "https://artistsite.netlify.app";
 
 module.exports = (app) => {
   app.set("trust proxy", 1);
